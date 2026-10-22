@@ -24,6 +24,24 @@ export const Colors = {
   },
 } as const;
 
+// Paleta do VagaCerta (telas de onboarding são sempre claras)
+export const Brand = {
+  primary: '#2F7BF6',
+  primaryLight: '#EAF2FF',
+  text: '#0F172A',
+  textSecondary: '#64748B',
+  textMuted: '#94A3B8',
+  inputBackground: '#F1F4F8',
+  border: '#E5E9F0',
+  background: '#F7F9FC',
+  white: '#FFFFFF',
+  success: '#22C55E',
+  successLight: '#E8F8EE',
+  warning: '#F59E0B',
+  warningLight: '#FEF4E2',
+  danger: '#EF4444',
+} as const;
+
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({
