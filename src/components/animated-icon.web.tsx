@@ -2,22 +2,7 @@ import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 import Animated, { Keyframe, Easing } from 'react-native-reanimated';
 
-import classes from './animated-icon.module.css';
 const DURATION = 300;
-
-const keyframe = new Keyframe({
-  0: {
-    transform: [{ scale: 0 }],
-  },
-  60: {
-    transform: [{ scale: 1.2 }],
-    easing: Easing.elastic(1.2),
-  },
-  100: {
-    transform: [{ scale: 1 }],
-    easing: Easing.elastic(1.2),
-  },
-});
 
 const logoKeyframe = new Keyframe({
   0: {
@@ -57,12 +42,9 @@ export function AnimatedIcon() {
         <Image style={styles.glow} source={require('@/assets/images/logo-glow.png')} />
       </Animated.View>
 
-      <Animated.View style={styles.background} entering={keyframe.duration(DURATION)}>
-        <div className={classes.expoLogoBackground} />
-      </Animated.View>
 
       <Animated.View style={styles.imageContainer} entering={logoKeyframe.duration(DURATION)}>
-        <Image style={styles.image} source={require('@/assets/images/expo-logo.png')} />
+        <Image style={styles.image} source={require('@/assets/images/logo-mark.png')} />
       </Animated.View>
     </View>
   );
@@ -93,12 +75,7 @@ const styles = StyleSheet.create({
   },
   image: {
     position: 'absolute',
-    width: 76,
-    height: 71,
-  },
-  background: {
     width: 128,
     height: 128,
-    position: 'absolute',
   },
 });
