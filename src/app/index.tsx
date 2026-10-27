@@ -1,7 +1,6 @@
 import { isClerkAPIResponseError, useSignIn, useSSO } from '@clerk/expo';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -160,7 +159,7 @@ export default function LoginScreen() {
               disabled={loading}
               onPress={() => signInWithProvider('oauth_google')}
               accessibilityRole="button">
-              <Text style={styles.googleG}>G</Text>
+              <Image source={require('@/assets/images/google.svg')} style={styles.socialIcon} />
               <Text style={styles.googleText}>Entrar com Google</Text>
             </Pressable>
             <Pressable
@@ -168,11 +167,7 @@ export default function LoginScreen() {
               disabled={loading}
               onPress={() => signInWithProvider('oauth_apple')}
               accessibilityRole="button">
-              <SymbolView
-                name={{ ios: 'apple.logo', android: 'phone_iphone', web: 'phone_iphone' }}
-                size={20}
-                tintColor={Brand.text}
-              />
+              <Image source={require('@/assets/images/apple.svg')} style={styles.socialIcon} />
               <Text style={styles.googleText}>Entrar com Apple</Text>
             </Pressable>
           </View>
@@ -322,10 +317,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
   },
-  googleG: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#4285F4',
+  socialIcon: {
+    width: 20,
+    height: 20,
   },
   googleText: {
     fontSize: 16,

@@ -32,10 +32,13 @@ export default function SignUpScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [accepted, setAccepted] = useState(true);
 
   const score = passwordScore(password);
   const strength = STRENGTH[score];
+  const mismatch = confirm.length > 0 && confirm !== password;
+  const canSubmit = accepted && !!password && confirm === password;
 
   return (
     <View style={styles.screen}>
@@ -125,6 +128,21 @@ export default function SignUpScreen() {
               )}
             </View>
 
+            <View style={styles.passwordGroup}>
+              <Input
+                label="Confirmar senha"
+                icon={{ ios: 'lock', android: 'lock', web: 'lock' }}
+                placeholder="Repita sua senha"
+                value={confirm}
+                onChangeText={setConfirm}
+                autoComplete="new-password"
+                secure
+              />
+              {mismatch && (
+                <Text style={[styles.strength, { color: Brand.danger }]}>As senhas não coincidem</Text>
+              )}
+            </View>
+
             <Pressable
               style={styles.terms}
               onPress={() => setAccepted((a) => !a)}
@@ -148,8 +166,8 @@ export default function SignUpScreen() {
 
             <Button
               title="Criar minha conta"
-              disabled={!accepted}
-              style={!accepted && styles.disabled}
+              disabled={!canSubmit}
+              style={!canSubmit && styles.disabled}
               onPress={() => router.replace('/localizacao')}
             />
           </View>

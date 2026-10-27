@@ -17,7 +17,7 @@ O front de **Login**, **Localização** e **Notificações** já existe (`src/ap
 - [x] **Segurança (seção 5.10):** `helmet`, `cors` configurado, `express-rate-limit` e `express.json()` com limite de tamanho.
 - [x] **Middleware JWT do Clerk** (`requireAuth`): valida o token do header `Authorization: Bearer ...` e coloca o `userId` em `req`. Responde `401` sem token ou com token inválido. Usar o SDK oficial do Clerk para Node/Express; conferir a doc atual antes de escrever.
 - [x] Rota `GET /health` pública e `GET /me` protegida (retorna o `userId`), para todos testarem a autenticação.
-- [ ] Tratamento de erros centralizado (resposta JSON padronizada, sem vazar stack trace).
+- [x] Tratamento de erros centralizado (resposta JSON padronizada, sem vazar stack trace).
 - [ ] `.env.example` com os nomes das variáveis (sem valores), `.env` no `.gitignore`.
 - [ ] `backend/README.md` com: como rodar, variáveis necessárias e como chamar uma rota protegida. Lembrar que no Expo Go o celular acessa o backend pelo **IP da máquina na rede Wi-Fi**, não por `localhost`.
 - [ ] Avisar o grupo quando o PR estiver aprovado.
