@@ -192,7 +192,12 @@ Os requisitos funcionais descrevem as ações e funcionalidades que o VagaCerta 
 * **RF09** — O sistema deve permitir que o usuário visualize uma rota até o estacionamento escolhido, por meio da opção "Como chegar".  
 * **RF10** — O sistema deve permitir que o usuário salve estacionamentos como favoritos.  
 * **RF11** — O sistema deve permitir que o usuário acesse e gerencie sua lista de estacionamentos favoritos.  
-* **RF12** — O sistema deve permitir a alternância entre a visualização em mapa e em lista dos resultados de busca.
+* **RF12** — O sistema deve permitir a alternância entre a visualização em mapa e em lista dos resultados de busca.  
+* **RF13** — O sistema deve permitir que o usuário crie uma conta informando nome, e-mail e senha, ou utilizando sua conta Google.  
+* **RF14** — O sistema deve permitir que o usuário recupere o acesso à conta por meio da opção "Esqueci minha senha", com envio de link ou código de redefinição para o e-mail cadastrado.  
+* **RF15** — O sistema deve disponibilizar uma tela de perfil em que o usuário visualize os dados da conta, encerre a sessão (logout) e consulte as informações de privacidade e uso da localização.  
+* **RF16** — O sistema deve permitir que o usuário realize a pesquisa de endereço, bairro ou região por voz, por meio de um botão de microfone na barra de pesquisa, convertendo a fala em texto para preencher a busca.  
+* **RF17** — O sistema deve solicitar ao usuário, em tela própria e antes do primeiro uso, a permissão de acesso ao microfone, explicando que o recurso é usado apenas para a pesquisa por voz, e deve manter a pesquisa por texto disponível caso a permissão seja negada.
 
 ### **4.2 Requisitos Não Funcionais (RNF)**
 
@@ -222,7 +227,8 @@ O aplicativo é desenvolvido em **React Native com Expo**, com um único código
 * **Mapa:** react-native-maps, para exibir os estacionamentos e a localização do usuário.  
 * **Localização:** expo-location, para obter a posição atual com a permissão do usuário (RF01).  
 * **Busca por endereço:** geocodificação pelo serviço gratuito **Nominatim (OpenStreetMap)** (RF03).  
-* **Rota ("Como chegar"):** o app abre o aplicativo de mapas do dispositivo (Google Maps ou Waze) com o destino já preenchido, sem custo e sem necessidade de chaves de API (RF09).
+* **Pesquisa por voz:** reconhecimento de fala no dispositivo para converter a fala em texto na barra de pesquisa, com permissão de microfone (RF16 e RF17). Atenção: esse recurso depende de módulo nativo que o Expo Go não inclui, podendo exigir um *development build* (a definir pela equipe).  
+* **Rota ("Como chegar"):** o app abre o aplicativo de mapas do dispositivo (Google Maps ou Waze ou Apple Maps, somente ios) com o destino já preenchido, sem custo e sem necessidade de chaves de API (RF09).
 
 ## **5.3 Autenticação**
 
