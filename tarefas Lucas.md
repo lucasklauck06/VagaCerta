@@ -31,6 +31,7 @@ Conferir a versão do `expo` no `package.json` e a doc do Clerk para Expo antes 
 - [ ] **Login** (`src/app/index.tsx`): ligar os campos de e-mail e senha ao Clerk, mostrar erros (credenciais inválidas, e-mail inexistente, sem conexão) e estado de carregando no botão. Hoje o botão "Entrar" só chama `router.replace('/localizacao')`.
 - [ ] Ligar o checkbox "Lembrar de mim" a algo real ou removê-lo (decidir com o grupo; a sessão do Clerk já persiste).
 - [ ] **Login com Google:** ligar o botão "Entrar com Google".
+- [ ] **Login com Apple:** ligar o botão "Entrar com Apple".
 - [ ] Adicionar uma função de `fetch` autenticado em `src/` (ex.: `lib/api.ts`) que anexa o token do Clerk e usa a URL base do backend por variável de ambiente. **Todos os alunos vão usar**, então avise quando estiver pronta.
 
 ## 3. Criar conta — RF13 (tela nova)
@@ -38,6 +39,7 @@ Conferir a versão do `expo` no `package.json` e a doc do Clerk para Expo antes 
 - [ ] Campos: nome, e-mail, senha e confirmar senha. Validar no app: e-mail válido, senha com tamanho mínimo, senhas iguais.
 - [ ] Fluxo do Clerk para e-mail/senha, incluindo a **verificação por código enviado ao e-mail**, se estiver ativada.
 - [ ] Botão "Criar com Google".
+- [ ] Botão "Criar com Apple".
 - [ ] Link "Criar conta" do login passa a navegar para essa tela, e a tela tem um "Já tenho conta".
 - [ ] Mensagens de erro claras (e-mail já cadastrado, senha fraca).
 
