@@ -11,7 +11,7 @@ O front de **Login**, **Localização** e **Notificações** já existe (`src/ap
 **O esqueleto do Express e o middleware JWT são pré-requisito dos outros 4 alunos. Entregue a Parte 1 primeiro, em um PR pequeno e separado**, e só depois siga para as telas.
 
 ## 1. Base do backend (Node + Express) — fazer primeiro
-- [ ] Criar a pasta `backend/` (ou o nome que o grupo escolher) com `package.json`, servidor Express e script `dev`.
+- [X] Criar a pasta `backend/` (ou o nome que o grupo escolher) com `package.json`, servidor Express e script `dev`.
 - [ ] Estrutura mínima para os outros plugarem rotas: `routes/`, `middleware/`, `lib/supabase.js` e `index.js`. O objetivo é cada aluno adicionar seu arquivo de rotas sem conflito.
 - [ ] Cliente do Supabase com a **chave de serviço**, lida de variável de ambiente e usada só no backend.
 - [ ] **Segurança (seção 5.10):** `helmet`, `cors` configurado, `express-rate-limit` e `express.json()` com limite de tamanho.
