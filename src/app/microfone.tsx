@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import { Brand } from '@/constants/theme';
+import { markOnboarded } from '@/lib/onboarding';
 
 const FEATURES: { label: string; icon: SymbolViewProps['name']; color: string; bg: string }[] = [
   {
@@ -29,7 +30,10 @@ const FEATURES: { label: string; icon: SymbolViewProps['name']; color: string; b
 
 export default function MicPermissionScreen() {
   // Somente frontend: a permissão real do microfone entra aqui depois
-  const close = () => router.replace('/home');
+  const close = () => {
+    markOnboarded();
+    router.replace('/home');
+  };
 
   return (
     <View style={styles.screen}>

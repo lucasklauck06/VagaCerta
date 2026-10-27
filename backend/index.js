@@ -1,8 +1,16 @@
+require('./lib/supabase');
 const express = require('express');
+const { clerkMiddleware } = require('@clerk/express');
+const requireAuth = require('./middleware/requireAuth');
 
 const app = express();
-
+app.use(require('helmet')());
+app.use(require('cors')({ origin: process.env.CORS_ORIGIN || false }));
+app.use(require('express-rate-limit')({ windowMs: 15 * 60 * 1000, limit: 100 }));
+app.use(express.json({ limit: '100kb' }));
 app.use('/health', require('./routes/health'));
+app.use(clerkMiddleware());
+app.use('/me', requireAuth, require('./routes/me'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, (err) => {

@@ -12,11 +12,11 @@ O front de **Login**, **Localização** e **Notificações** já existe (`src/ap
 
 ## 1. Base do backend (Node + Express) — fazer primeiro
 - [X] Criar a pasta `backend/` (ou o nome que o grupo escolher) com `package.json`, servidor Express e script `dev`.
-- [ ] Estrutura mínima para os outros plugarem rotas: `routes/`, `middleware/`, `lib/supabase.js` e `index.js`. O objetivo é cada aluno adicionar seu arquivo de rotas sem conflito.
-- [ ] Cliente do Supabase com a **chave de serviço**, lida de variável de ambiente e usada só no backend.
-- [ ] **Segurança (seção 5.10):** `helmet`, `cors` configurado, `express-rate-limit` e `express.json()` com limite de tamanho.
-- [ ] **Middleware JWT do Clerk** (`requireAuth`): valida o token do header `Authorization: Bearer ...` e coloca o `userId` em `req`. Responde `401` sem token ou com token inválido. Usar o SDK oficial do Clerk para Node/Express; conferir a doc atual antes de escrever.
-- [ ] Rota `GET /health` pública e `GET /me` protegida (retorna o `userId`), para todos testarem a autenticação.
+- [x] Estrutura mínima para os outros plugarem rotas: `routes/`, `middleware/`, `lib/supabase.js` e `index.js`. O objetivo é cada aluno adicionar seu arquivo de rotas sem conflito.
+- [x] Cliente do Supabase com a **chave de serviço**, lida de variável de ambiente e usada só no backend.
+- [x] **Segurança (seção 5.10):** `helmet`, `cors` configurado, `express-rate-limit` e `express.json()` com limite de tamanho.
+- [x] **Middleware JWT do Clerk** (`requireAuth`): valida o token do header `Authorization: Bearer ...` e coloca o `userId` em `req`. Responde `401` sem token ou com token inválido. Usar o SDK oficial do Clerk para Node/Express; conferir a doc atual antes de escrever.
+- [x] Rota `GET /health` pública e `GET /me` protegida (retorna o `userId`), para todos testarem a autenticação.
 - [ ] Tratamento de erros centralizado (resposta JSON padronizada, sem vazar stack trace).
 - [ ] `.env.example` com os nomes das variáveis (sem valores), `.env` no `.gitignore`.
 - [ ] `backend/README.md` com: como rodar, variáveis necessárias e como chamar uma rota protegida. Lembrar que no Expo Go o celular acessa o backend pelo **IP da máquina na rede Wi-Fi**, não por `localhost`.
@@ -25,14 +25,14 @@ O front de **Login**, **Localização** e **Notificações** já existe (`src/ap
 ## 2. Autenticação com Clerk (app)
 Conferir a versão do `expo` no `package.json` e a doc do Clerk para Expo antes de começar. O Expo Go limita alguns recursos nativos; confirmar o que funciona nele (ex.: login com Google pode exigir fluxo OAuth pelo navegador).
 
-- [ ] Criar a aplicação no Clerk, ativar e-mail/senha e Google, e guardar a *publishable key* em variável de ambiente do app.
-- [ ] Instalar com `npx expo install` e envolver o app com o `ClerkProvider` em `src/app/_layout.tsx`, com *token cache* seguro (`expo-secure-store`).
-- [ ] **Proteção de rotas:** usuário não logado vai para o login; logado vai direto para a Home. Quem já viu Localização/Notificações não precisa vê-las de novo (guardar essa flag localmente).
-- [ ] **Login** (`src/app/index.tsx`): ligar os campos de e-mail e senha ao Clerk, mostrar erros (credenciais inválidas, e-mail inexistente, sem conexão) e estado de carregando no botão. Hoje o botão "Entrar" só chama `router.replace('/localizacao')`.
+- [x] Criar a aplicação no Clerk, ativar e-mail/senha e Google, e guardar a *publishable key* em variável de ambiente do app.
+- [x] Instalar com `npx expo install` e envolver o app com o `ClerkProvider` em `src/app/_layout.tsx`, com *token cache* seguro (`expo-secure-store`).
+- [x] **Proteção de rotas:** usuário não logado vai para o login; logado vai direto para a Home. Quem já viu Localização/Notificações não precisa vê-las de novo (guardar essa flag localmente).
+- [x] **Login** (`src/app/index.tsx`): ligar os campos de e-mail e senha ao Clerk, mostrar erros (credenciais inválidas, e-mail inexistente, sem conexão) e estado de carregando no botão. Hoje o botão "Entrar" só chama `router.replace('/localizacao')`.
 - [ ] Ligar o checkbox "Lembrar de mim" a algo real ou removê-lo (decidir com o grupo; a sessão do Clerk já persiste).
-- [ ] **Login com Google:** ligar o botão "Entrar com Google".
-- [ ] **Login com Apple:** ligar o botão "Entrar com Apple".
-- [ ] Adicionar uma função de `fetch` autenticado em `src/` (ex.: `lib/api.ts`) que anexa o token do Clerk e usa a URL base do backend por variável de ambiente. **Todos os alunos vão usar**, então avise quando estiver pronta.
+- [x] **Login com Google:** ligar o botão "Entrar com Google".
+- [x] **Login com Apple:** ligar o botão "Entrar com Apple".
+- [x] Adicionar uma função de `fetch` autenticado em `src/` (ex.: `lib/api.ts`) que anexa o token do Clerk e usa a URL base do backend por variável de ambiente. **Todos os alunos vão usar**, então avise quando estiver pronta.
 
 ## 3. Criar conta — RF13 (tela nova)
 - [ ] Nova rota (ex.: `src/app/cadastro.tsx`), com o mesmo visual do login (reaproveitar `Input`, `Button` e `Brand`).

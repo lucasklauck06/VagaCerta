@@ -1,5 +1,7 @@
+import { isClerkAPIResponseError, useSignIn, useSSO } from '@clerk/expo';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +15,60 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
+  const [code, setCode] = useState('');
+  const [needsCode, setNeedsCode] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useSignIn();
+  const { startSSOFlow } = useSSO();
+
+  // Roda uma ação do Clerk com loading + mensagem de erro amigável.
+  const run = async (action: () => Promise<void>) => {
+    setError('');
+    setLoading(true);
+    try {
+      await action();
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Após o login, o _layout troca de tela sozinho (Stack.Protected).
+  const finish = async () => {
+    if (signIn.status !== 'complete') throw new Error(`Login incompleto (${signIn.status}).`);
+    const { error } = await signIn.finalize();
+    if (error) throw error;
+  };
+
+  const signInWithPassword = () =>
+    run(async () => {
+      if (!email || !password) throw new Error('Preencha e-mail e senha.');
+      const { error } = await signIn.password({ identifier: email.trim(), password });
+      if (error) throw error;
+      // Aparelho novo (device trust) ou 2FA: Clerk pede código enviado ao e-mail.
+      if (signIn.status === 'needs_client_trust' || signIn.status === 'needs_second_factor') {
+        const { error } = await signIn.mfa.sendEmailCode();
+        if (error) throw error;
+        setNeedsCode(true);
+        return;
+      }
+      await finish();
+    });
+
+  const verifyCode = () =>
+    run(async () => {
+      const { error } = await signIn.mfa.verifyEmailCode({ code: code.trim() });
+      if (error) throw error;
+      await finish();
+    });
+
+  const signInWithProvider = (strategy: 'oauth_google' | 'oauth_apple') =>
+    run(async () => {
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy });
+      if (createdSessionId) await setActive?.({ session: createdSessionId });
+    });
 
   return (
     <View style={styles.screen}>
@@ -63,6 +119,17 @@ export default function LoginScreen() {
               autoComplete="password"
               secure
             />
+            {needsCode && (
+              <Input
+                label="Código enviado ao seu e-mail"
+                icon={{ ios: 'number', android: 'pin', web: 'pin' }}
+                placeholder="000000"
+                value={code}
+                onChangeText={setCode}
+                keyboardType="number-pad"
+                autoComplete="one-time-code"
+              />
+            )}
 
             <View style={styles.row}>
               <Checkbox label="Lembrar de mim" checked={remember} onChange={setRemember} />
@@ -71,7 +138,14 @@ export default function LoginScreen() {
               </Pressable>
             </View>
 
-            <Button title="Entrar" onPress={() => router.replace('/localizacao')} />
+            {!!error && <Text style={styles.error}>{error}</Text>}
+
+            <Button
+              title={loading ? 'Entrando...' : needsCode ? 'Confirmar código' : 'Entrar'}
+              disabled={loading}
+              style={loading && { opacity: 0.6 }}
+              onPress={needsCode ? verifyCode : signInWithPassword}
+            />
           </View>
 
           <View style={styles.divider}>
@@ -80,12 +154,28 @@ export default function LoginScreen() {
             <View style={styles.line} />
           </View>
 
-          <Pressable
-            style={({ pressed }) => [styles.googleButton, pressed && { opacity: 0.85 }]}
-            accessibilityRole="button">
-            <Text style={styles.googleG}>G</Text>
-            <Text style={styles.googleText}>Entrar com Google</Text>
-          </Pressable>
+          <View style={styles.social}>
+            <Pressable
+              style={({ pressed }) => [styles.googleButton, pressed && { opacity: 0.85 }]}
+              disabled={loading}
+              onPress={() => signInWithProvider('oauth_google')}
+              accessibilityRole="button">
+              <Text style={styles.googleG}>G</Text>
+              <Text style={styles.googleText}>Entrar com Google</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.googleButton, pressed && { opacity: 0.85 }]}
+              disabled={loading}
+              onPress={() => signInWithProvider('oauth_apple')}
+              accessibilityRole="button">
+              <SymbolView
+                name={{ ios: 'apple.logo', android: 'phone_iphone', web: 'phone_iphone' }}
+                size={20}
+                tintColor={Brand.text}
+              />
+              <Text style={styles.googleText}>Entrar com Apple</Text>
+            </Pressable>
+          </View>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>
@@ -99,6 +189,27 @@ export default function LoginScreen() {
       </SafeAreaView>
     </View>
   );
+}
+
+function errorMessage(e: unknown) {
+  const code = isClerkAPIResponseError(e) ? e.errors[0]?.code : (e as { code?: string })?.code;
+  switch (code) {
+    case 'form_password_incorrect':
+      return 'Senha incorreta.';
+    case 'form_identifier_not_found':
+      return 'Não existe conta com esse e-mail.';
+    case 'form_param_format_invalid':
+      return 'E-mail inválido.';
+    case 'form_code_incorrect':
+      return 'Código incorreto.';
+    case 'network_error':
+      return 'Sem conexão. Verifique sua internet.';
+  }
+  if (e instanceof TypeError || /network/i.test(String((e as Error)?.message))) {
+    return 'Sem conexão. Verifique sua internet.';
+  }
+  if (isClerkAPIResponseError(e)) return e.errors[0]?.longMessage ?? e.message;
+  return (e as Error)?.message ?? 'Algo deu errado. Tente novamente.';
 }
 
 const styles = StyleSheet.create({
@@ -191,6 +302,14 @@ const styles = StyleSheet.create({
   dividerText: {
     fontSize: 13,
     color: Brand.textMuted,
+  },
+  error: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Brand.danger,
+  },
+  social: {
+    gap: 12,
   },
   googleButton: {
     height: 56,
