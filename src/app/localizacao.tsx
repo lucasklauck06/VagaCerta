@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
@@ -30,10 +30,14 @@ const FEATURES: { label: string; icon: SymbolViewProps['name']; color: string; a
 export default function LocationPermissionScreen() {
   // Somente frontend: a permissão real (expo-location) entra aqui depois
   const next = () => router.push('/notificacoes');
+  const close = () => router.replace('/notificacoes');
 
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
+        <Pressable style={styles.skip} onPress={close} hitSlop={8} accessibilityRole="button">
+          <Text style={styles.skipText}>Agora não</Text>
+        </Pressable>
         <View style={styles.hero}>
           <View style={styles.ringOuter}>
             <View style={styles.ringInner}>
@@ -71,7 +75,6 @@ export default function LocationPermissionScreen() {
 
         <View style={styles.actions}>
           <Button title="Permitir acesso à localização" onPress={next} />
-          <Button title="Agora não" variant="secondary" onPress={next} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -86,7 +89,6 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     padding: 24,
-    justifyContent: 'center',
   },
   hero: {
     alignItems: 'center',
@@ -140,6 +142,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 20,
     boxShadow: '0 4px 16px rgba(15, 23, 42, 0.05)',
+  },
+  skip: {
+    alignSelf: 'flex-end',
+  },
+  skipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Brand.textSecondary,
   },
   feature: {
     flexDirection: 'row',

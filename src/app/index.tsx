@@ -66,7 +66,7 @@ export default function LoginScreen() {
 
             <View style={styles.row}>
               <Checkbox label="Lembrar de mim" checked={remember} onChange={setRemember} />
-              <Pressable hitSlop={8}>
+              <Pressable hitSlop={8} onPress={() => router.push('/esqueci-senha')}>
                 <Text style={styles.link}>Esqueci minha senha</Text>
               </Pressable>
             </View>
@@ -89,7 +89,10 @@ export default function LoginScreen() {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              Ainda não tem conta? <Text style={styles.link}>Criar conta</Text>
+              Ainda não tem conta?{' '}
+              <Text style={styles.link} onPress={() => router.push('/cadastro')}>
+                Criar conta
+              </Text>
             </Text>
           </View>
         </ScrollView>

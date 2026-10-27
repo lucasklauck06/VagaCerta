@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
@@ -47,11 +47,15 @@ export default function NotificationsPermissionScreen() {
   const [enabled, setEnabled] = useState({ vagas: true, lembretes: true, ofertas: false });
 
   // Somente frontend: a permissão real (expo-notifications) entra aqui depois
-  const finish = () => router.replace('/home');
+  const finish = () => router.replace('/microfone');
+  const close = () => router.replace('/microfone');
 
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
+        <Pressable style={styles.skip} onPress={close} hitSlop={8} accessibilityRole="button">
+          <Text style={styles.skipText}>Agora não</Text>
+        </Pressable>
         <View style={styles.hero}>
           <View style={styles.iconCard}>
             <View style={styles.iconSquare}>
@@ -100,7 +104,6 @@ export default function NotificationsPermissionScreen() {
             icon={{ ios: 'bell', android: 'notifications', web: 'notifications' }}
             onPress={finish}
           />
-          <Button title="Agora não" variant="secondary" onPress={finish} />
           <Text style={styles.privacy}>O VagaCerta respeita sua privacidade e não envia spam.</Text>
         </View>
       </ScrollView>
@@ -178,6 +181,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 16,
     boxShadow: '0 4px 16px rgba(15, 23, 42, 0.05)',
+  },
+  skip: {
+    alignSelf: 'flex-end',
+  },
+  skipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Brand.textSecondary,
   },
   option: {
     flexDirection: 'row',
