@@ -11,6 +11,7 @@ app.use(express.json({ limit: '100kb' }));
 app.use('/health', require('./routes/health'));
 app.use(clerkMiddleware());
 app.use('/me', requireAuth, require('./routes/me'));
+app.use('/parkings', requireAuth, require('./routes/parkings'));
 app.use((req, res) => res.status(404).json({ error: 'Rota não encontrada' }));
 app.use(require('./middleware/errorHandler'));
 
