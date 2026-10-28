@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch --env-file-if-exists=.env index.js"
+    "dev": "node --watch --env-file-if-exists=.env index.js",
+    "test": "node lib/parkingStatus.js && node lib/hours.js"
   },
   "keywords": [],
   "author": "",

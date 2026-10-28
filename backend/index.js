@@ -2,6 +2,7 @@ require('./lib/supabase');
 const express = require('express');
 const { clerkMiddleware } = require('@clerk/express');
 const requireAuth = require('./middleware/requireAuth');
+const { startSpotSimulation } = require('./jobs/simulateSpots');
 
 const app = express();
 app.use(require('helmet')());
@@ -19,4 +20,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, (err) => {
     if (err) throw err;
     console.log(`API rodando na porta ${PORT}`);
+    startSpotSimulation();
 });
