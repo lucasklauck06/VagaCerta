@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -17,10 +17,8 @@ import { FavoriteButton } from '@/components/favorite-button';
 import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { Brand } from '@/constants/theme';
+import { formatDistance, formatFreeSpots, formatPrice } from '@/lib/format';
 import { getParking, type ParkingDetail } from '@/lib/parking-api';
-
-const formatDistance = (m: number) => (m < 1000 ? `${m} m` : `${(m / 1000).toFixed(1)} km`);
-const formatPrice = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}/h`;
 
 async function open(url: string) {
   try {
@@ -35,21 +33,23 @@ export default function ParkingScreen() {
   const { width } = useWindowDimensions();
   const [parking, setParking] = useState<ParkingDetail | null>(null);
   const [state, setState] = useState<'loading' | 'ok' | 'error' | 'notfound'>('loading');
+  const [attempt, setAttempt] = useState(0);
 
-  const load = useCallback(async () => {
-    setState('loading');
-    try {
-      const p = await getParking(id);
-      setParking(p);
-      setState(p ? 'ok' : 'notfound');
-    } catch {
-      setState('error');
-    }
-  }, [id]);
-
+  // Busca ao abrir e a cada "Tentar de novo"; `active` descarta resposta de um id anterior.
   useEffect(() => {
-    load();
-  }, [load]);
+    let active = true;
+    getParking(id).then(
+      (p) => {
+        if (!active) return;
+        setParking(p);
+        setState(p ? 'ok' : 'notfound');
+      },
+      () => active && setState('error'),
+    );
+    return () => {
+      active = false;
+    };
+  }, [id, attempt]);
 
   const header = (
     <Stack.Screen
@@ -79,7 +79,13 @@ export default function ParkingScreen() {
           {state === 'notfound' ? 'Estacionamento não encontrado' : 'Não foi possível carregar'}
         </Text>
         {state === 'error' && (
-          <Button title="Tentar de novo" onPress={load} style={{ marginTop: 16, alignSelf: 'stretch' }} />
+          <Button
+            title="Tentar de novo"
+            onPress={() => {
+              setState('loading');
+              setAttempt((n) => n + 1);
+            }}
+            style={{ marginTop: 16, alignSelf: 'stretch' }} />
         )}
       </View>
     );
@@ -123,9 +129,7 @@ export default function ParkingScreen() {
           <StatusBadge status={parking.status} />
         </View>
         {parking.freeSpots > 0 && (
-          <Text style={styles.text}>
-            {parking.freeSpots} {parking.freeSpots === 1 ? 'vaga livre' : 'vagas livres'}
-          </Text>
+          <Text style={styles.text}>{formatFreeSpots(parking.freeSpots)}</Text>
         )}
 
         <Text style={styles.section}>Horário de funcionamento</Text>
