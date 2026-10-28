@@ -20,7 +20,7 @@ O front de **Login**, **Localização** e **Notificações** já existe (`src/ap
 - [x] Tratamento de erros centralizado (resposta JSON padronizada, sem vazar stack trace).
 - [x] `.env.example` com os nomes das variáveis (sem valores), `.env` no `.gitignore`.
 - [x] `backend/README.md` com: como rodar, variáveis necessárias e como chamar uma rota protegida. Lembrar que no Expo Go o celular acessa o backend pelo **IP da máquina na rede Wi-Fi**, não por `localhost`.
-- [ ] Avisar o grupo quando o PR estiver aprovado.
+- [X] Avisar o grupo quando o PR estiver aprovado.
 
 ## 2. Autenticação com Clerk (app)
 Conferir a versão do `expo` no `package.json` e a doc do Clerk para Expo antes de começar. O Expo Go limita alguns recursos nativos; confirmar o que funciona nele (ex.: login com Google pode exigir fluxo OAuth pelo navegador).
