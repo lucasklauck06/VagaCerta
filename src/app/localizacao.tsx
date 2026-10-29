@@ -1,3 +1,4 @@
+import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -28,8 +29,14 @@ const FEATURES: { label: string; icon: SymbolViewProps['name']; color: string; a
 ];
 
 export default function LocationPermissionScreen() {
-  // Somente frontend: a permissão real (expo-location) entra aqui depois
-  const next = () => router.push('/notificacoes');
+  // Aceitando ou negando, segue o fluxo; a Home funciona sem a posição.
+  const next = async () => {
+    try {
+      await Location.requestForegroundPermissionsAsync();
+    } finally {
+      router.push('/notificacoes');
+    }
+  };
   const close = () => router.replace('/notificacoes');
 
   return (

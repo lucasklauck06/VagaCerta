@@ -1,10 +1,11 @@
 import { router } from 'expo-router';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import { Brand } from '@/constants/theme';
+import { useMicPermission } from '@/hooks/use-mic-permission';
 import { markOnboarded } from '@/lib/onboarding';
 
 const FEATURES: { label: string; icon: SymbolViewProps['name']; color: string; bg: string }[] = [
@@ -29,10 +30,23 @@ const FEATURES: { label: string; icon: SymbolViewProps['name']; color: string; b
 ];
 
 export default function MicPermissionScreen() {
-  // Somente frontend: a permissão real do microfone entra aqui depois
+  const { status, canAskAgain, request } = useMicPermission();
+  // Negada de vez: o sistema não mostra mais o prompt, só as configurações.
+  const blocked = status === 'denied' && !canAskAgain;
+
   const close = () => {
     markOnboarded();
     router.replace('/home');
+  };
+
+  // Permitindo ou negando, segue para a Home; a busca por texto continua disponível.
+  const allow = async () => {
+    if (blocked) return Linking.openSettings();
+    try {
+      await request();
+    } finally {
+      close();
+    }
   };
 
   return (
@@ -78,8 +92,8 @@ export default function MicPermissionScreen() {
 
           <Text style={styles.title}>Encontre vagas falando</Text>
           <Text style={styles.subtitle}>
-            Permita o uso do microfone para auxiliar na pesquisa de estacionamentos de forma rápida e
-            prática.
+            O microfone é usado só para pesquisar endereços por voz. A pesquisa por texto continua
+            disponível.
           </Text>
 
           <View style={styles.card}>
@@ -95,9 +109,9 @@ export default function MicPermissionScreen() {
 
           <View style={styles.actions}>
             <Button
-              title="Permitir acesso ao microfone"
+              title={blocked ? 'Abrir configurações' : 'Permitir acesso ao microfone'}
               icon={{ ios: 'mic', android: 'mic', web: 'mic' }}
-              onPress={close}
+              onPress={allow}
             />
             <Text style={styles.note}>Você pode alterar essa permissão nas configurações.</Text>
           </View>

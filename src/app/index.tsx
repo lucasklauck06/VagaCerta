@@ -1,15 +1,15 @@
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Brand } from '@/constants/theme';
+import { errorMessage } from '@/lib/clerk-error';
+import { setRemember as saveRemember } from '@/lib/onboarding';
 import { useSignIn, useSSO } from '@clerk/expo';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Brand } from '@/constants/theme';
-import { errorMessage } from '@/lib/clerk-error';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -27,6 +27,7 @@ export default function LoginScreen() {
   const run = async (action: () => Promise<void>) => {
     setError('');
     setLoading(true);
+    saveRemember(remember);
     try {
       await action();
     } catch (e) {

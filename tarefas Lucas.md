@@ -29,7 +29,7 @@ Conferir a versão do `expo` no `package.json` e a doc do Clerk para Expo antes 
 - [x] Instalar com `npx expo install` e envolver o app com o `ClerkProvider` em `src/app/_layout.tsx`, com *token cache* seguro (`expo-secure-store`).
 - [x] **Proteção de rotas:** usuário não logado vai para o login; logado vai direto para a Home. Quem já viu Localização/Notificações não precisa vê-las de novo (guardar essa flag localmente).
 - [x] **Login** (`src/app/index.tsx`): ligar os campos de e-mail e senha ao Clerk, mostrar erros (credenciais inválidas, e-mail inexistente, sem conexão) e estado de carregando no botão. Hoje o botão "Entrar" só chama `router.replace('/localizacao')`.
-- [ ] Ligar o checkbox "Lembrar de mim" a algo real ou removê-lo (decidir com o grupo; a sessão do Clerk já persiste).
+- [x] Ligar o checkbox "Lembrar de mim" a algo real ou removê-lo (decidir com o grupo; a sessão do Clerk já persiste).
 - [x] **Login com Google:** ligar o botão "Entrar com Google".
 - [x] **Login com Apple:** ligar o botão "Entrar com Apple".
 - [x] Adicionar uma função de `fetch` autenticado em `src/` (ex.: `lib/api.ts`) que anexa o token do Clerk e usa a URL base do backend por variável de ambiente. **Todos os alunos vão usar**, então avise quando estiver pronta.
@@ -51,30 +51,30 @@ Conferir a versão do `expo` no `package.json` e a doc do Clerk para Expo antes 
 - [x] Voltar ao login com mensagem de sucesso ao final.
 
 ## 5. Permissão de localização — RF01 (`localizacao.tsx`)
-- [ ] Trocar o comentário "Somente frontend" por `expo-location`: pedir a permissão em primeiro plano ao tocar em "Permitir acesso à localização".
-- [ ] Seguir para Notificações tanto se aceitar quanto se negar ("Agora não" não pede nada).
-- [ ] Criar um hook compartilhado (ex.: `useUserLocation`) que retorna `status` da permissão e coordenadas. **O Artur usa na Home**, então combine a assinatura com ele.
-- [ ] Caso o usuário negue: não travar o app; a Home deve funcionar sem a posição.
-- [ ] Não armazenar a localização de forma permanente (RNF06).
-- [ ] Definir a mensagem de uso da localização na configuração do app (`app.json`/plugin), conforme a doc do Expo da versão usada.
+- [x] Trocar o comentário "Somente frontend" por `expo-location`: pedir a permissão em primeiro plano ao tocar em "Permitir acesso à localização".
+- [x] Seguir para Notificações tanto se aceitar quanto se negar ("Agora não" não pede nada).
+- [x] Criar um hook compartilhado (ex.: `useUserLocation`) que retorna `status` da permissão e coordenadas. **O Artur usa na Home**, então combine a assinatura com ele.
+- [x] Caso o usuário negue: não travar o app; a Home deve funcionar sem a posição.
+- [x] Não armazenar a localização de forma permanente (RNF06).
+- [x] Definir a mensagem de uso da localização na configuração do app (`app.json`/plugin), conforme a doc do Expo da versão usada.
 
 ## 6. Permissão de notificações (`notificacoes.tsx`)
-- [ ] O doc (seção 5.9) diz que push está **fora do escopo inicial**. Implementar só a **solicitação de permissão** com `expo-notifications`; não é preciso enviar push de verdade.
-- [ ] Guardar as preferências dos switches localmente (ex.: `AsyncStorage`) para o Erico poder mostrar/alterar no Perfil, se quiserem.
+- [x] O doc (seção 5.9) diz que push está **fora do escopo inicial**. Implementar só a **solicitação de permissão** com `expo-notifications`; não é preciso enviar push de verdade.
+- [x] Guardar as preferências dos switches localmente (ex.: `AsyncStorage`) para o Erico poder mostrar/alterar no Perfil, se quiserem.
 - [ ] O Expo Go tem restrições com notificações push remotas; se atrapalhar, deixar só a permissão local e registrar no README.
-- [ ] Ao terminar (aceitando ou não), marcar o onboarding como concluído e ir para a Home.
+- [x] Ao terminar (aceitando ou não), marcar o onboarding como concluído e ir para a Home.
 
 ## 7. Permissão de microfone — RF17 (tela nova)
 A pesquisa por voz (RF16) é feita pelo **Vinicius** na barra de busca; você entrega a **tela de permissão** e o **hook** que ele usa.
 
-- [ ] Nova rota (ex.: `src/app/microfone.tsx`), no mesmo padrão visual de `localizacao.tsx` e `notificacoes.tsx` (ícone grande, título, texto, card com benefícios, botões "Permitir" e "Agora não").
-- [ ] Texto deixando claro que o microfone é usado **só para pesquisar endereços por voz** e que a pesquisa por texto continua disponível.
-- [ ] "Permitir" dispara a permissão real do microfone. Qual API usar depende de como o Vinicius fará o reconhecimento de fala (veja o ponto sobre Expo Go abaixo); combinem a biblioteca **antes** de implementar, para pedirem a mesma permissão.
-- [ ] Criar um hook compartilhado (ex.: `useMicPermission`) que retorna `status` (`undetermined` / `granted` / `denied`) e `request()`. **O Vinicius usa no botão de microfone**, então combine a assinatura com ele.
+- [x] Nova rota (ex.: `src/app/microfone.tsx`), no mesmo padrão visual de `localizacao.tsx` e `notificacoes.tsx` (ícone grande, título, texto, card com benefícios, botões "Permitir" e "Agora não").
+- [x] Texto deixando claro que o microfone é usado **só para pesquisar endereços por voz** e que a pesquisa por texto continua disponível.
+- [x] "Permitir" dispara a permissão real do microfone. Qual API usar depende de como o Vinicius fará o reconhecimento de fala (veja o ponto sobre Expo Go abaixo); combinem a biblioteca **antes** de implementar, para pedirem a mesma permissão.
+- [x] Criar um hook compartilhado (ex.: `useMicPermission`) que retorna `status` (`undetermined` / `granted` / `denied`) e `request()`. **O Vinicius usa no botão de microfone**, então combine a assinatura com ele.
 - [ ] **Quando mostrar a tela:** decidam com o Vinicius entre (a) no onboarding, depois de Notificações, ou (b) **sob demanda**, na primeira vez que o usuário tocar no microfone. A (b) é a mais indicada por ser contextual e não pedir algo que o usuário talvez nunca use. Se for (b), a tela abre como modal/tela empilhada e volta para a busca ao terminar.
-- [ ] Se a permissão estiver **negada de forma permanente**, a tela deve oferecer "Abrir configurações" (`Linking.openSettings()`) em vez de pedir de novo.
-- [ ] Negar não trava nada: volta para a barra de busca com o teclado normal.
-- [ ] Declarar a mensagem de uso do microfone na configuração do app (`app.json`/plugin), conforme a doc do Expo da versão usada. No iOS, o reconhecimento de fala também pode exigir uma descrição própria.
+- [x] Se a permissão estiver **negada de forma permanente**, a tela deve oferecer "Abrir configurações" (`Linking.openSettings()`) em vez de pedir de novo.
+- [x] Negar não trava nada: volta para a barra de busca com o teclado normal.
+- [x] Declarar a mensagem de uso do microfone na configuração do app (`app.json`/plugin), conforme a doc do Expo da versão usada. No iOS, o reconhecimento de fala também pode exigir uma descrição própria.
 - [ ] **Expo Go:** o reconhecimento de fala geralmente depende de módulo nativo que o Expo Go não traz, o que exigiria um *development build* (`npx expo run:android|ios` ou `eas build --profile development`). Confirmar na doc do Expo com o Vinicius **no primeiro dia** e avisar o grupo, porque a seção 5.2 do doc prevê demonstração só pelo Expo Go.
 - [ ] Avisar o Erico para incluir o estado do microfone na seção de permissões do Perfil.
 

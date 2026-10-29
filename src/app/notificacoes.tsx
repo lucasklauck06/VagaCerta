@@ -1,3 +1,5 @@
+import * as Notifications from 'expo-notifications';
+import { AndroidImportance } from 'expo-notifications';
 import { router } from 'expo-router';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import { useState } from 'react';
@@ -6,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import { Brand } from '@/constants/theme';
+import { getNotificationPrefs, setNotificationPrefs } from '@/lib/onboarding';
 
 type Option = {
   key: 'vagas' | 'lembretes' | 'ofertas';
@@ -44,10 +47,22 @@ const OPTIONS: Option[] = [
 ];
 
 export default function NotificationsPermissionScreen() {
-  const [enabled, setEnabled] = useState({ vagas: true, lembretes: true, ofertas: false });
+  const [enabled, setEnabled] = useState(getNotificationPrefs);
 
-  // Somente frontend: a permissão real (expo-notifications) entra aqui depois
-  const finish = () => router.replace('/microfone');
+  // Só pede a permissão (push remoto está fora do escopo). Negando, o fluxo segue igual.
+  const finish = async () => {
+    setNotificationPrefs(enabled);
+    try {
+      // No Android 13+ o prompt só aparece depois que existe um canal de notificação.
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'Geral',
+        importance: AndroidImportance.DEFAULT,
+      });
+      await Notifications.requestPermissionsAsync();
+    } finally {
+      router.replace('/microfone');
+    }
+  };
   const close = () => router.replace('/microfone');
 
   return (
