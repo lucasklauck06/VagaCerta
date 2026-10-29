@@ -35,13 +35,13 @@ Conferir a versão do `expo` no `package.json` e a doc do Clerk para Expo antes 
 - [x] Adicionar uma função de `fetch` autenticado em `src/` (ex.: `lib/api.ts`) que anexa o token do Clerk e usa a URL base do backend por variável de ambiente. **Todos os alunos vão usar**, então avise quando estiver pronta.
 
 ## 3. Criar conta — RF13 (tela nova)
-- [ ] Nova rota (ex.: `src/app/cadastro.tsx`), com o mesmo visual do login (reaproveitar `Input`, `Button` e `Brand`).
-- [ ] Campos: nome, e-mail, senha e confirmar senha. Validar no app: e-mail válido, senha com tamanho mínimo, senhas iguais.
-- [ ] Fluxo do Clerk para e-mail/senha, incluindo a **verificação por código enviado ao e-mail**, se estiver ativada.
-- [ ] Botão "Criar com Google".
-- [ ] Botão "Criar com Apple".
-- [ ] Link "Criar conta" do login passa a navegar para essa tela, e a tela tem um "Já tenho conta".
-- [ ] Mensagens de erro claras (e-mail já cadastrado, senha fraca).
+- [x] Nova rota (ex.: `src/app/cadastro.tsx`), com o mesmo visual do login (reaproveitar `Input`, `Button` e `Brand`).
+- [x] Campos: nome, e-mail, senha e confirmar senha. Validar no app: e-mail válido, senha com tamanho mínimo, senhas iguais.
+- [x] Fluxo do Clerk para e-mail/senha, incluindo a **verificação por código enviado ao e-mail**, se estiver ativada.
+- [x] Botão "Criar com Google".
+- [x] Botão "Criar com Apple".
+- [x] Link "Criar conta" do login passa a navegar para essa tela, e a tela tem um "Já tenho conta".
+- [x] Mensagens de erro claras (e-mail já cadastrado, senha fraca).
 
 ## 4. Esqueci minha senha — RF14 (tela nova)
 - [ ] Nova rota (ex.: `src/app/esqueci-senha.tsx`).

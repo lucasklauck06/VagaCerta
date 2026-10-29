@@ -1,3 +1,4 @@
+import { useSignUp, useSSO } from '@clerk/expo';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
@@ -8,6 +9,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Brand } from '@/constants/theme';
+import { errorMessage } from '@/lib/clerk-error';
+
+const MIN_PASSWORD = 8;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const STRENGTH = [
   { label: 'Senha fraca', color: Brand.danger },
@@ -34,11 +39,73 @@ export default function SignUpScreen() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [accepted, setAccepted] = useState(true);
+  const [code, setCode] = useState('');
+  const [needsCode, setNeedsCode] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useSignUp();
+  const { startSSOFlow } = useSSO();
 
   const score = passwordScore(password);
   const strength = STRENGTH[score];
   const mismatch = confirm.length > 0 && confirm !== password;
-  const canSubmit = accepted && !!password && confirm === password;
+  const canSubmit = accepted && !!password && confirm === password && !loading;
+
+  // Roda uma ação do Clerk com loading + mensagem de erro amigável.
+  const run = async (action: () => Promise<void>) => {
+    setError('');
+    setLoading(true);
+    try {
+      await action();
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Após finalizar, o _layout troca de tela sozinho (Stack.Protected).
+  const finish = async () => {
+    if (signUp.status !== 'complete') throw new Error(`Cadastro incompleto (${signUp.status}).`);
+    const { error } = await signUp.finalize();
+    if (error) throw error;
+  };
+
+  const createAccount = () =>
+    run(async () => {
+      const [firstName, ...rest] = name.trim().split(/\s+/);
+      if (!firstName) throw new Error('Informe seu nome.');
+      if (!EMAIL_RE.test(email.trim())) throw new Error('E-mail inválido.');
+      if (password.length < MIN_PASSWORD) {
+        throw new Error(`A senha precisa ter pelo menos ${MIN_PASSWORD} caracteres.`);
+      }
+      if (password !== confirm) throw new Error('As senhas não coincidem.');
+
+      const { error } = await signUp.password({
+        emailAddress: email.trim(),
+        password,
+        firstName,
+        lastName: rest.join(' ') || undefined,
+      });
+      if (error) throw error;
+      // E-mail precisa de verificação por código.
+      const sent = await signUp.verifications.sendEmailCode();
+      if (sent.error) throw sent.error;
+      setNeedsCode(true);
+    });
+
+  const verifyCode = () =>
+    run(async () => {
+      const { error } = await signUp.verifications.verifyEmailCode({ code: code.trim() });
+      if (error) throw error;
+      await finish();
+    });
+
+  const signUpWithProvider = (strategy: 'oauth_google' | 'oauth_apple') =>
+    run(async () => {
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy });
+      if (createdSessionId) await setActive?.({ session: createdSessionId });
+    });
 
   return (
     <View style={styles.screen}>
@@ -164,12 +231,51 @@ export default function SignUpScreen() {
               </Text>
             </Pressable>
 
+            {needsCode && (
+              <Input
+                label="Código enviado ao seu e-mail"
+                icon={{ ios: 'number', android: 'pin', web: 'pin' }}
+                placeholder="000000"
+                value={code}
+                onChangeText={setCode}
+                keyboardType="number-pad"
+                autoComplete="one-time-code"
+              />
+            )}
+
+            {!!error && <Text style={styles.error}>{error}</Text>}
+
             <Button
-              title="Criar minha conta"
+              title={loading ? 'Aguarde...' : needsCode ? 'Confirmar código' : 'Criar minha conta'}
               disabled={!canSubmit}
               style={!canSubmit && styles.disabled}
-              onPress={() => router.replace('/localizacao')}
+              onPress={needsCode ? verifyCode : createAccount}
             />
+          </View>
+
+          <View style={styles.divider}>
+            <View style={styles.line} />
+            <Text style={styles.dividerText}>ou crie com</Text>
+            <View style={styles.line} />
+          </View>
+
+          <View style={styles.social}>
+            <Pressable
+              style={({ pressed }) => [styles.socialButton, pressed && { opacity: 0.85 }]}
+              disabled={loading}
+              onPress={() => signUpWithProvider('oauth_google')}
+              accessibilityRole="button">
+              <Image source={require('@/assets/images/google.svg')} style={styles.socialIcon} />
+              <Text style={styles.socialText}>Criar com Google</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.socialButton, pressed && { opacity: 0.85 }]}
+              disabled={loading}
+              onPress={() => signUpWithProvider('oauth_apple')}
+              accessibilityRole="button">
+              <Image source={require('@/assets/images/apple.svg')} style={styles.socialIcon} />
+              <Text style={styles.socialText}>Criar com Apple</Text>
+            </Pressable>
           </View>
 
           <View style={styles.footer}>
@@ -301,6 +407,49 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.5,
+  },
+  error: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Brand.danger,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginVertical: 28,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Brand.border,
+  },
+  dividerText: {
+    fontSize: 13,
+    color: Brand.textMuted,
+  },
+  social: {
+    gap: 12,
+  },
+  socialButton: {
+    height: 56,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Brand.border,
+    backgroundColor: Brand.white,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  socialIcon: {
+    width: 20,
+    height: 20,
+  },
+  socialText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Brand.text,
   },
   footer: {
     flex: 1,

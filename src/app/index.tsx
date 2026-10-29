@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError, useSignIn, useSSO } from '@clerk/expo';
+import { useSignIn, useSSO } from '@clerk/expo';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Brand } from '@/constants/theme';
+import { errorMessage } from '@/lib/clerk-error';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -184,27 +185,6 @@ export default function LoginScreen() {
       </SafeAreaView>
     </View>
   );
-}
-
-function errorMessage(e: unknown) {
-  const code = isClerkAPIResponseError(e) ? e.errors[0]?.code : (e as { code?: string })?.code;
-  switch (code) {
-    case 'form_password_incorrect':
-      return 'Senha incorreta.';
-    case 'form_identifier_not_found':
-      return 'Não existe conta com esse e-mail.';
-    case 'form_param_format_invalid':
-      return 'E-mail inválido.';
-    case 'form_code_incorrect':
-      return 'Código incorreto.';
-    case 'network_error':
-      return 'Sem conexão. Verifique sua internet.';
-  }
-  if (e instanceof TypeError || /network/i.test(String((e as Error)?.message))) {
-    return 'Sem conexão. Verifique sua internet.';
-  }
-  if (isClerkAPIResponseError(e)) return e.errors[0]?.longMessage ?? e.message;
-  return (e as Error)?.message ?? 'Algo deu errado. Tente novamente.';
 }
 
 const styles = StyleSheet.create({
