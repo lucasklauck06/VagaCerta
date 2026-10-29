@@ -1,6 +1,6 @@
 import { useSignIn, useSSO } from '@clerk/expo';
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +21,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const { signIn } = useSignIn();
   const { startSSOFlow } = useSSO();
+  const { reset } = useLocalSearchParams<{ reset?: string }>();
 
   // Roda uma ação do Clerk com loading + mensagem de erro amigável.
   const run = async (action: () => Promise<void>) => {
@@ -138,6 +139,9 @@ export default function LoginScreen() {
               </Pressable>
             </View>
 
+            {reset === '1' && !error && (
+              <Text style={styles.success}>Senha redefinida! Entre com a nova senha.</Text>
+            )}
             {!!error && <Text style={styles.error}>{error}</Text>}
 
             <Button
@@ -282,6 +286,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: Brand.danger,
+  },
+  success: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Brand.success,
   },
   social: {
     gap: 12,

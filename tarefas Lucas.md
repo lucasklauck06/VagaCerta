@@ -44,11 +44,11 @@ Conferir a versão do `expo` no `package.json` e a doc do Clerk para Expo antes 
 - [x] Mensagens de erro claras (e-mail já cadastrado, senha fraca).
 
 ## 4. Esqueci minha senha — RF14 (tela nova)
-- [ ] Nova rota (ex.: `src/app/esqueci-senha.tsx`).
-- [ ] Passo 1: informar o e-mail e solicitar o código/link. Passo 2: informar o código e a nova senha.
-- [ ] Ligar o "Esqueci minha senha" do login a essa tela (hoje o `Pressable` não faz nada).
-- [ ] Não revelar se um e-mail existe ou não na mensagem de sucesso, se o Clerk permitir esse comportamento.
-- [ ] Voltar ao login com mensagem de sucesso ao final.
+- [x] Nova rota (ex.: `src/app/esqueci-senha.tsx`).
+- [x] Passo 1: informar o e-mail e solicitar o código/link. Passo 2: informar o código e a nova senha.
+- [x] Ligar o "Esqueci minha senha" do login a essa tela (hoje o `Pressable` não faz nada).
+- [x] Não revelar se um e-mail existe ou não na mensagem de sucesso, se o Clerk permitir esse comportamento.
+- [x] Voltar ao login com mensagem de sucesso ao final.
 
 ## 5. Permissão de localização — RF01 (`localizacao.tsx`)
 - [ ] Trocar o comentário "Somente frontend" por `expo-location`: pedir a permissão em primeiro plano ao tocar em "Permitir acesso à localização".

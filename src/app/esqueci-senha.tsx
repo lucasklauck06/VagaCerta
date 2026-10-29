@@ -1,3 +1,4 @@
+import { useSignIn } from '@clerk/expo';
 import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
@@ -7,10 +8,58 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Brand } from '@/constants/theme';
+import { errorMessage } from '@/lib/clerk-error';
+
+const MIN_PASSWORD = 8;
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
+  const [step, setStep] = useState<'email' | 'reset'>('email');
+  const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useSignIn();
+
   const valid = /^\S+@\S+\.\S+$/.test(email);
+  const canReset = !!code && password.length >= MIN_PASSWORD && password === confirm && !loading;
+
+  // Roda uma ação do Clerk com loading + mensagem de erro amigável.
+  const run = async (action: () => Promise<void>) => {
+    setError('');
+    setLoading(true);
+    try {
+      await action();
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Passo 1: pede o código. Avança mesmo se o e-mail não existir, para não revelar quem tem conta.
+  const sendCode = () =>
+    run(async () => {
+      const created = await signIn.create({ identifier: email.trim() });
+      if (created.error) {
+        if (created.error.code !== 'form_identifier_not_found') throw created.error;
+      } else {
+        const sent = await signIn.resetPasswordEmailCode.sendCode();
+        if (sent.error) throw sent.error;
+      }
+      setStep('reset');
+    });
+
+  // Passo 2: confere o código e grava a nova senha. Não chamamos finalize(): o usuário volta ao login.
+  const resetPassword = () =>
+    run(async () => {
+      const verified = await signIn.resetPasswordEmailCode.verifyCode({ code: code.trim() });
+      if (verified.error) throw verified.error;
+      const done = await signIn.resetPasswordEmailCode.submitPassword({ password });
+      if (done.error) throw done.error;
+      router.replace({ pathname: '/', params: { reset: '1' } });
+    });
 
   return (
     <View style={styles.screen}>
@@ -55,28 +104,74 @@ export default function ForgotPasswordScreen() {
           <View style={styles.header}>
             <Text style={styles.title}>Esqueceu sua senha?</Text>
             <Text style={styles.subtitle}>
-              Digite o e-mail usado no cadastro e enviaremos um link para você criar uma nova senha.
+              {step === 'email'
+                ? 'Digite o e-mail usado no cadastro e enviaremos um código para você criar uma nova senha.'
+                : 'Se existir uma conta com esse e-mail, enviamos um código. Digite-o abaixo e escolha a nova senha.'}
             </Text>
           </View>
 
           <View style={styles.form}>
-            <Input
-              label="E-mail cadastrado"
-              icon={{ ios: 'envelope', android: 'mail', web: 'mail' }}
-              placeholder="seu@email.com"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-            />
-            {/* Somente frontend: o envio real do link entra aqui depois */}
-            <Button
-              title="Enviar link de recuperação"
-              disabled={!valid}
-              style={!valid && styles.disabled}
-              onPress={() => router.back()}
-            />
+            {step === 'email' ? (
+              <>
+                <Input
+                  label="E-mail cadastrado"
+                  icon={{ ios: 'envelope', android: 'mail', web: 'mail' }}
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                />
+                {!!error && <Text style={styles.error}>{error}</Text>}
+                <Button
+                  title={loading ? 'Enviando...' : 'Enviar código'}
+                  disabled={!valid || loading}
+                  style={(!valid || loading) && styles.disabled}
+                  onPress={sendCode}
+                />
+              </>
+            ) : (
+              <>
+                <Input
+                  label="Código enviado ao seu e-mail"
+                  icon={{ ios: 'number', android: 'pin', web: 'pin' }}
+                  placeholder="000000"
+                  value={code}
+                  onChangeText={setCode}
+                  keyboardType="number-pad"
+                  autoComplete="one-time-code"
+                />
+                <Input
+                  label="Nova senha"
+                  icon={{ ios: 'lock', android: 'lock', web: 'lock' }}
+                  placeholder={`Mínimo de ${MIN_PASSWORD} caracteres`}
+                  value={password}
+                  onChangeText={setPassword}
+                  autoComplete="new-password"
+                  secure
+                />
+                <Input
+                  label="Confirmar nova senha"
+                  icon={{ ios: 'lock', android: 'lock', web: 'lock' }}
+                  placeholder="Repita a nova senha"
+                  value={confirm}
+                  onChangeText={setConfirm}
+                  autoComplete="new-password"
+                  secure
+                />
+                {confirm.length > 0 && confirm !== password && (
+                  <Text style={styles.error}>As senhas não coincidem</Text>
+                )}
+                {!!error && <Text style={styles.error}>{error}</Text>}
+                <Button
+                  title={loading ? 'Salvando...' : 'Redefinir senha'}
+                  disabled={!canReset}
+                  style={!canReset && styles.disabled}
+                  onPress={resetPassword}
+                />
+              </>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -164,6 +259,11 @@ const styles = StyleSheet.create({
   form: {
     marginTop: 32,
     gap: 20,
+  },
+  error: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Brand.danger,
   },
   disabled: {
     backgroundColor: '#C3CEDD',
