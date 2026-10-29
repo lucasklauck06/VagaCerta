@@ -3,10 +3,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Brand } from '@/constants/theme';
 import { errorMessage } from '@/lib/clerk-error';
-import { setRemember as saveRemember } from '@/lib/onboarding';
-import { useSignIn, useSSO } from '@clerk/expo';
+import { hasOnboarded, setRemember as saveRemember } from '@/lib/onboarding';
+import { useAuth, useSignIn, useSSO } from '@clerk/expo';
 import { Image } from 'expo-image';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,6 +19,7 @@ export default function LoginScreen() {
   const [needsCode, setNeedsCode] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { isSignedIn } = useAuth();
   const { signIn } = useSignIn();
   const { startSSOFlow } = useSSO();
   const { reset } = useLocalSearchParams<{ reset?: string }>();
@@ -71,6 +72,9 @@ export default function LoginScreen() {
       const { createdSessionId, setActive } = await startSSOFlow({ strategy });
       if (createdSessionId) await setActive?.({ session: createdSessionId });
     });
+
+  // Já logado (login ou app reaberto): sai do login para a tela certa.
+  if (isSignedIn) return <Redirect href={hasOnboarded() ? '/home' : '/localizacao'} />;
 
   return (
     <View style={styles.screen}>

@@ -54,10 +54,13 @@ export default function NotificationsPermissionScreen() {
     setNotificationPrefs(enabled);
     try {
       // No Android 13+ o prompt só aparece depois que existe um canal de notificação.
+      // Os campos extras evitam um NullPointerException do módulo nativo (valores nulos).
       await Notifications.setNotificationChannelAsync('default', {
         name: 'Geral',
         importance: AndroidImportance.DEFAULT,
-      });
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#2F7BF6',
+      }).catch(() => {}); // falha no canal não impede de pedir a permissão
       await Notifications.requestPermissionsAsync();
     } finally {
       router.replace('/microfone');
