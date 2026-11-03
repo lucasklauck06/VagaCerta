@@ -63,3 +63,34 @@ Se não conectar:
 - **Windows:** o firewall costuma bloquear o Node. Aceite o aviso para **redes privadas** ou libere a porta 3000 no Firewall do Windows.
 - Redes de faculdade/empresa às vezes isolam os aparelhos entre si. Nesse caso, use o roteador do celular (hotspot).
 - O IP muda quando você troca de rede. Se parou de funcionar, rode o comando do passo 1 de novo.
+
+## Banco de dados (Supabase)
+Rodar no **SQL Editor** do Supabase, nesta ordem (todos podem ser rodados de novo sem erro):
+
+1. `sql/001_parkings.sql` — PostGIS, tabela `parkings` (+ índice GIST), RLS só de leitura, Realtime e a função `nearby_parkings`.
+2. `sql/001_parkings_seed.sql` — 18 estacionamentos fictícios na região da Av. Paulista (SP), com lotados e com poucas vagas.
+3. `sql/002_parking_hours.sql` — horários e bucket de imagens (Vitor).
+
+Conferir em **Database → Publications → supabase_realtime** se a tabela `parkings` aparece (o script 001 já a adiciona).
+
+## Estacionamentos próximos — `GET /parkings`
+Protegida (`requireAuth`). Query params:
+
+| Param | Regra |
+|---|---|
+| `lat` | obrigatório, -90 a 90 |
+| `lng` | obrigatório, -180 a 180 |
+| `radius` | metros, opcional, padrão 5000, de 1 a 50000 |
+
+Os filtros `maxPrice`, `status`, `openNow` e `sort` são do Vinicius (ver `tarefas Vinicius.md`). Param inválido responde `400`.
+
+Resposta: lista do mais próximo para o mais distante, cada item com
+`id, name, address, lat, lng, distanceM, pricePerHour, totalSpots, freeSpots, status, imageUrl`.
+
+**Status** (`lib/parkingStatus.js`, regra única do backend): `freeSpots == 0` → `lotado`; até 20% livres → `poucas_vagas`; senão `disponivel`. Testes: `npm test`.
+
+## Simulação de vagas
+Com `SIMULATE_SPOTS=true` no `.env`, o backend altera `free_spots` de 4 estacionamentos aleatórios (±1 a 5 vagas, sem passar de 0 nem do total) a cada `SIMULATE_INTERVAL_MS` (10000 a 30000 ms, padrão 15000). O app recebe as mudanças pelo Realtime do Supabase. **Ligue em só um computador do grupo** para não somar simulações.
+
+## Variáveis do app (`.env` na raiz)
+Ver `.env.example` da raiz. O app usa só a chave **publishable** do Supabase (para o Realtime); a secret nunca vai para o app.
